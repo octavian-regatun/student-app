@@ -1,32 +1,32 @@
-import Paper from "@material-ui/core/Paper";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import TextField from "@material-ui/core/TextField";
-import Grid from "@material-ui/core/Grid";
-import Container from "@material-ui/core/Container";
+import Paper from '@material-ui/core/Paper';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import TextField from '@material-ui/core/TextField';
+import Grid from '@material-ui/core/Grid';
+import Container from '@material-ui/core/Container';
 
-import axios from "axios";
-import React, { Component } from "react";
-import Sidebar from "../../components/Sidebar";
+import axios from 'axios';
+import React, { Component } from 'react';
+import Sidebar from '../../components/Sidebar';
 
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
-import Button from "@material-ui/core/Button";
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import Button from '@material-ui/core/Button';
 
-import { createMuiTheme } from "@material-ui/core/styles";
-import { withStyles } from "@material-ui/core/styles";
+import { createMuiTheme } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 
 const theme = createMuiTheme({});
 
 const Grade = {
-  subject: "",
+  subject: '',
   grades: [],
   thesis: null
 };
@@ -43,17 +43,17 @@ export class Teacher extends Component {
     grades: []
   };
 
-  subjects = ["Math", "Romanian", "Physics", "Chemistry", "Biology"];
+  subjects = ['Math', 'Romanian', 'Physics', 'Chemistry', 'Biology'];
 
   async getStudents() {
-    await axios.get("http://127.0.0.1:8080/api/students").then(res => {
+    await axios.get('http://127.0.0.1:8090/api/students').then(res => {
       this.setState({ students: res.data.students });
     });
   }
 
   async getStudent(firstName, lastName) {
     return await axios
-      .get("http://127.0.0.1:8080/api/student", {
+      .get('http://127.0.0.1:8090/api/student', {
         params: { firstName: firstName, lastName: lastName }
       })
       .then(async res => {
@@ -63,37 +63,37 @@ export class Teacher extends Component {
   }
 
   onClickTable = (event, field) => {
-    if (this.state.selectedStudent && field == "student") {
-      this.state.selectedStudent.style.color = "black";
-    } else if (this.state.selectedSubject && field == "subject") {
-      this.state.selectedSubject.style.color = "black";
+    if (this.state.selectedStudent && field == 'student') {
+      this.state.selectedStudent.style.color = 'black';
+    } else if (this.state.selectedSubject && field == 'subject') {
+      this.state.selectedSubject.style.color = 'black';
     }
 
-    if (field == "student") {
-      event.target.style.color = "blue";
+    if (field == 'student') {
+      event.target.style.color = 'blue';
       this.setState({ selectedStudent: event.target });
-    } else if (field == "subject") {
+    } else if (field == 'subject') {
       this.setState({ selectedSubject: event.target });
-      event.target.style.color = "red";
+      event.target.style.color = 'red';
     }
   };
 
   clearOnClick = () => {
     if (this.state.selectedStudent) {
       let selectedStudentDOM = this.state.selectedStudent;
-      selectedStudentDOM.style.color = "black";
+      selectedStudentDOM.style.color = 'black';
       this.setState({ selectedStudent: selectedStudentDOM });
     }
     if (this.state.selectedSubject) {
       let selectedSubjectDOM = this.state.selectedSubject;
-      selectedSubjectDOM.style.color = "black";
+      selectedSubjectDOM.style.color = 'black';
       this.setState({ selectedSubject: selectedSubjectDOM });
     }
   };
 
   async getGrades(studentId) {
     return await axios
-      .get(`http://127.0.0.1:8080/api/grades/` + studentId)
+      .get(`http://127.0.0.1:8090/api/grades/` + studentId)
       .then(
         response => {
           return response.data.grades;
@@ -108,7 +108,7 @@ export class Teacher extends Component {
 
   async postGrades(studentId, grades) {
     return await axios
-      .post(`http://127.0.0.1:8080/api/grades/` + studentId, grades)
+      .post(`http://127.0.0.1:8090/api/grades/` + studentId, grades)
       .then(
         response => {
           return response.data;
@@ -129,7 +129,7 @@ export class Teacher extends Component {
     // maybe unnecessary if
     if (this.state.students.length > 0) {
       grades = this.state.students.map(student => ({
-        student: student.firstName + " " + student.lastName,
+        student: student.firstName + ' ' + student.lastName,
         subjects: []
       }));
 
@@ -149,9 +149,12 @@ export class Teacher extends Component {
         serverGrades = serverGrades.grades;
       } else {
         for (const grades of this.state.grades) {
-          if (grades.student == student.firstName + " " + student.lastName) {
-            const response = await this.postGrades(student._id, grades.subjects);
-            console.log(response)
+          if (grades.student == student.firstName + ' ' + student.lastName) {
+            const response = await this.postGrades(
+              student._id,
+              grades.subjects
+            );
+            console.log(response);
           }
         }
       }
@@ -164,19 +167,19 @@ export class Teacher extends Component {
     const { classes } = this.props;
     return (
       <div>
-        <Sidebar page="Teacher">
+        <Sidebar page='Teacher'>
           <TableContainer component={Paper}>
-            <Table aria-label="spanning table">
+            <Table aria-label='spanning table'>
               <TableHead>
                 <TableRow>
-                  <TableCell align="center" colSpan={1}></TableCell>
+                  <TableCell align='center' colSpan={1}></TableCell>
                   {this.subjects.map(subject => {
                     return (
                       <TableCell
                         key={subject}
-                        align="center"
+                        align='center'
                         colSpan={2}
-                        onClick={event => this.onClickTable(event, "subject")}
+                        onClick={event => this.onClickTable(event, 'subject')}
                       >
                         {subject}
                       </TableCell>
@@ -184,12 +187,12 @@ export class Teacher extends Component {
                   })}
                 </TableRow>
                 <TableRow>
-                  <TableCell align="center"></TableCell>
+                  <TableCell align='center'></TableCell>
                   {this.subjects.map((subject, index) => {
                     return (
                       <React.Fragment key={index}>
-                        <TableCell align="center">Absences</TableCell>
-                        <TableCell align="center">Grades</TableCell>
+                        <TableCell align='center'>Absences</TableCell>
+                        <TableCell align='center'>Grades</TableCell>
                       </React.Fragment>
                     );
                   })}
@@ -198,11 +201,11 @@ export class Teacher extends Component {
               <TableBody>
                 {this.state.students.map(student => {
                   return (
-                    <TableRow key={student.firstName + " " + student.lastName}>
+                    <TableRow key={student.firstName + ' ' + student.lastName}>
                       <TableCell
-                        onClick={event => this.onClickTable(event, "student")}
+                        onClick={event => this.onClickTable(event, 'student')}
                       >
-                        {student.firstName + " " + student.lastName}
+                        {student.firstName + ' ' + student.lastName}
                       </TableCell>
                       {this.state.grades.map((grade, index) => {
                         return (
@@ -221,11 +224,11 @@ export class Teacher extends Component {
                                     let grade = this.state.grades[i];
                                     if (
                                       grade.student ==
-                                      student.firstName + " " + student.lastName
+                                      student.firstName + ' ' + student.lastName
                                     ) {
                                       for (const subject of grade.subjects) {
                                         gradesString = subject.grades.toString();
-                                        return gradesString.replace(",", ", ");
+                                        return gradesString.replace(',', ', ');
                                       }
                                     }
                                   }
@@ -246,15 +249,15 @@ export class Teacher extends Component {
               item
               xs={12}
               style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                marginTop: "32px"
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: '32px'
               }}
             >
               <Button
-                variant="contained"
-                color="primary"
+                variant='contained'
+                color='primary'
                 onClick={this.clearOnClick}
               >
                 Clear
@@ -262,38 +265,38 @@ export class Teacher extends Component {
             </Grid>
           </Grid>
 
-          <Container maxWidth="md">
+          <Container maxWidth='md'>
             <Grid container>
               <Grid item xs={12}>
-                <p align="center" style={{ fontSize: "40px" }}>
+                <p align='center' style={{ fontSize: '40px' }}>
                   Add Student
                 </p>
               </Grid>
-              <Grid item xs={6} style={{ paddingRight: "16px" }}>
-                <FormControl style={{ width: "100%" }}>
+              <Grid item xs={6} style={{ paddingRight: '16px' }}>
+                <FormControl style={{ width: '100%' }}>
                   <InputLabel
-                    variant="outlined"
-                    id="demo-simple-select-autowidth-label"
+                    variant='outlined'
+                    id='demo-simple-select-autowidth-label'
                   >
                     Student
                   </InputLabel>
                   <Select
-                    labelId="demo-simple-select-autowidth-label"
-                    id="demo-simple-select-autowidth"
+                    labelId='demo-simple-select-autowidth-label'
+                    id='demo-simple-select-autowidth'
                     // value=
                     // onChange={}
                     autoWidth
                   >
-                    <MenuItem value="">
+                    <MenuItem value=''>
                       <em>None</em>
                     </MenuItem>
                     {this.state.students.map((student, index) => {
                       return (
                         <MenuItem
-                          value={student.firstName + " " + student.lastName}
+                          value={student.firstName + ' ' + student.lastName}
                           key={index}
                         >
-                          {student.firstName + " " + student.lastName}
+                          {student.firstName + ' ' + student.lastName}
                         </MenuItem>
                       );
                     })}
@@ -301,21 +304,21 @@ export class Teacher extends Component {
                 </FormControl>
               </Grid>
               <Grid item xs={6}>
-                <FormControl style={{ width: "100%" }}>
+                <FormControl style={{ width: '100%' }}>
                   <InputLabel
-                    variant="outlined"
-                    id="demo-simple-select-autowidth-label"
+                    variant='outlined'
+                    id='demo-simple-select-autowidth-label'
                   >
                     Subject
                   </InputLabel>
                   <Select
-                    labelId="demo-simple-select-autowidth-label"
-                    id="demo-simple-select-autowidth"
+                    labelId='demo-simple-select-autowidth-label'
+                    id='demo-simple-select-autowidth'
                     // value=
                     // onChange={}
                     autoWidth
                   >
-                    <MenuItem value="">
+                    <MenuItem value=''>
                       <em>None</em>
                     </MenuItem>
                     {this.subjects.map((subject, index) => {
@@ -332,27 +335,27 @@ export class Teacher extends Component {
                 item
                 xs={12}
                 style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  marginTop: "32px"
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: '32px'
                 }}
               >
-                <FormControl style={{ width: "150px" }}>
+                <FormControl style={{ width: '150px' }}>
                   <InputLabel
-                    variant="outlined"
-                    id="demo-simple-select-autowidth-label"
+                    variant='outlined'
+                    id='demo-simple-select-autowidth-label'
                   >
                     Type
                   </InputLabel>
                   <Select
-                    labelId="demo-simple-select-autowidth-label"
-                    id="demo-simple-select-autowidth"
+                    labelId='demo-simple-select-autowidth-label'
+                    id='demo-simple-select-autowidth'
                     // value=
                     // onChange={}
                     autoWidth
                   >
-                    <MenuItem value="">
+                    <MenuItem value=''>
                       <em>None</em>
                     </MenuItem>
                     <MenuItem value={1}>Absences</MenuItem>
@@ -364,15 +367,15 @@ export class Teacher extends Component {
                 item
                 xs={12}
                 style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  marginTop: "32px"
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: '32px'
                 }}
               >
                 <Button
-                  variant="contained"
-                  color="primary"
+                  variant='contained'
+                  color='primary'
                   onClick={this.submit}
                 >
                   Add
