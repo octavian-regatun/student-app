@@ -62,6 +62,18 @@ export class Teacher extends Component {
       });
   }
 
+  getStudentId(name) {
+    const firstName = name.split(" ")[0];
+    const lastName = name.split(" ")[1];
+
+    for (const student of this.state.students) {
+      if (student.firstName == firstName && student.lastName == lastName) {
+        return student._id;
+      }
+    }
+    return "invalid name";
+  }
+
   onClickTable = (event, field) => {
     if (this.state.selectedStudent && field == "student") {
       this.state.selectedStudent.style.color = "black";
@@ -121,6 +133,11 @@ export class Teacher extends Component {
       );
   }
 
+  changeValueSelect(value, idDOM) {
+    let selectDOM = document.getElementById(idDOM);
+    selectDOM.value = value;
+  }
+
   async componentDidMount() {
     await this.getStudents();
 
@@ -142,21 +159,43 @@ export class Teacher extends Component {
 
     this.setState({ grades: grades });
 
-    for (const student of this.state.students) {
-      let serverGrades = await this.getGrades(student._id);
+    for (const grades of this.state.grades) {
+      const student = grades.student;
+      const id = this.getStudentId(student);
 
-      if (serverGrades) {
-        serverGrades = serverGrades.grades;
-      } else {
-        for (const grades of this.state.grades) {
-          if (grades.student == student.firstName + " " + student.lastName) {
-            const response = await this.postGrades(student._id, grades.subjects);
-            console.log(response)
-          }
-        }
+      const response = await this.getGrades(id);
+      const responseGrades = response.grades;
+
+      if (
+        responseGrades == undefined ||
+        (Array.isArray(responseGrades) && responseGrades.length == 0)
+      ) {
+        console.log(grades.subjects);
+        console.log(await this.postGrades(id, grades.subjects));
       }
+    }
 
-      console.log(serverGrades);
+    for (const grades of this.state.grades) {
+      const student = grades.student;
+      const id = this.getStudentId(student);
+
+      const response = await this.getGrades(id);
+      const responseGrades = response.grades;
+
+      grades.subjects = responseGrades;
+    }
+
+    this.setState({ grades: grades });
+  }
+
+  componentDidUpdate() {
+    if (this.state.selectedStudent) {
+    console.log(this.state.selectedStudent.innerHTML)
+
+      this.changeValueSelect(
+        this.state.selectedStudent.innerHTML,
+        "selectStudent"
+      );
     }
   }
 
@@ -196,40 +235,22 @@ export class Teacher extends Component {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {this.state.students.map(student => {
+                {this.state.grades.map(grade => {
                   return (
-                    <TableRow key={student.firstName + " " + student.lastName}>
+                    <TableRow key={grade.student}>
                       <TableCell
                         onClick={event => this.onClickTable(event, "student")}
                       >
-                        {student.firstName + " " + student.lastName}
+                        {grade.student}
                       </TableCell>
-                      {this.state.grades.map((grade, index) => {
+                      {grade.subjects.map((subject, index) => {
                         return (
                           <React.Fragment key={index}>
-                            <TableCell>empty</TableCell>
-                            <TableCell>
+                            <TableCell align="center">empty</TableCell>
+                            <TableCell align="center">
                               {(() => {
-                                let gradesString;
-                                // return gradesString.replace(",", ", ");
-                                if (this.state.grades.length > 0) {
-                                  for (
-                                    let i = 0;
-                                    i < this.state.grades.length;
-                                    i++
-                                  ) {
-                                    let grade = this.state.grades[i];
-                                    if (
-                                      grade.student ==
-                                      student.firstName + " " + student.lastName
-                                    ) {
-                                      for (const subject of grade.subjects) {
-                                        gradesString = subject.grades.toString();
-                                        return gradesString.replace(",", ", ");
-                                      }
-                                    }
-                                  }
-                                }
+                                let gradesString = subject.grades.toString();
+                                return gradesString.replace(/,/g, ", ");
                               })()}
                             </TableCell>
                           </React.Fragment>
@@ -266,7 +287,7 @@ export class Teacher extends Component {
             <Grid container>
               <Grid item xs={12}>
                 <p align="center" style={{ fontSize: "40px" }}>
-                  Add Student
+                  Add Grades / Absences
                 </p>
               </Grid>
               <Grid item xs={6} style={{ paddingRight: "16px" }}>
@@ -279,7 +300,7 @@ export class Teacher extends Component {
                   </InputLabel>
                   <Select
                     labelId="demo-simple-select-autowidth-label"
-                    id="demo-simple-select-autowidth"
+                    id="selectStudent"
                     // value=
                     // onChange={}
                     autoWidth
@@ -287,13 +308,13 @@ export class Teacher extends Component {
                     <MenuItem value="">
                       <em>None</em>
                     </MenuItem>
-                    {this.state.students.map((student, index) => {
+                    {this.state.grades.map((grade, index) => {
                       return (
                         <MenuItem
-                          value={student.firstName + " " + student.lastName}
+                          value={grade.student}
                           key={index}
                         >
-                          {student.firstName + " " + student.lastName}
+                          {grade.student}
                         </MenuItem>
                       );
                     })}
@@ -310,7 +331,7 @@ export class Teacher extends Component {
                   </InputLabel>
                   <Select
                     labelId="demo-simple-select-autowidth-label"
-                    id="demo-simple-select-autowidth"
+                    id="selectSubject"
                     // value=
                     // onChange={}
                     autoWidth
@@ -347,7 +368,7 @@ export class Teacher extends Component {
                   </InputLabel>
                   <Select
                     labelId="demo-simple-select-autowidth-label"
-                    id="demo-simple-select-autowidth"
+                    id="selectType"
                     // value=
                     // onChange={}
                     autoWidth
